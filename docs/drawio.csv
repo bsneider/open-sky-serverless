@@ -1,0 +1,19 @@
+## AWS diagram
+# label: %component%
+# style: shape=%shape%;fillColor=%fill%;strokeColor=%stroke%;verticalLabelPosition=bottom;
+# namespace: csvimport-
+# connect: {"from":"refs", "to":"id", "invert":true, "style":"curved=0;endArrow=none;endFill=0;dashed=1;strokeColor=#6c8ebf;"}
+# width: 80
+# height: 80
+# ignore: id,shape,fill,stroke,refs
+# nodespacing: 40
+# levelspacing: 40
+# edgespacing: 40
+# layout: horizontaltree
+## CSV starts below this line
+id,component,fill,stroke,shape,refs,refLabel
+1,API Gateway,#5A30B5,#ffffff,mxgraph.aws4.api_gateway,,
+2,Load Data to S3,#277116,none,mxgraph.aws4.lambda_function,1,POST
+3,Query S3-Select & Aggregate,#277116,none,mxgraph.aws4.lambda_function,1,GET
+4,S3,#277116,#ffffff,mxgraph.aws4.s3,"2,3",
+

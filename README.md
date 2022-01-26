@@ -2,12 +2,17 @@
 
 - [open-sky-serverless](#open-sky-serverless)
   - [Assignment - Terraform AWS Deployment](#assignment---terraform-aws-deployment)
+    - [Research / Architecture Decisions](#research--architecture-decisions)
     - [Prerequisite](#prerequisite)
     - [Requirements](#requirements)
     - [Deliverable](#deliverable)
     - [Gift Card](#gift-card)
 
 ## Assignment - Terraform AWS Deployment
+
+### Research / Architecture Decisions
+
+[Research/Architecture Decisions](/docs/research.md)
 
 ---
 
