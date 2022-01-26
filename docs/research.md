@@ -2,6 +2,7 @@
 
 - [research](#research)
   - [Architecture](#architecture)
+    - [Challenges](#challenges)
     - [Assumptions](#assumptions)
     - [Serverless + Cloud Native (RDS vs S3 Select vs Athena vs DynamoDB NoSQL)](#serverless--cloud-native-rds-vs-s3-select-vs-athena-vs-dynamodb-nosql)
       - [S3-Select vs Athena](#s3-select-vs-athena)
@@ -11,6 +12,22 @@
 ## Architecture
 
 ![architecture diagram](architecture.drawio.svg)
+
+### Challenges
+
+- After extended testing S3-Select does not have the following abilities
+  - to calculate the frequency of fields
+  - nor does it have the ability to select the aggregate max of a date time
+  - additionally, the file is too large to query in the s3 console meaning that testing of the syntax was conducted used boto3 on the local machine
+- Converting the string to a datetime was a challenge that was solved `TO_TIMESTAMP(lastseen, 'y-MM-dd H:mm:ssXXX')`.
+
+As a result of these challenges the next pivot is to try using Athena, which has complex query capabilities, however it requires defining a schema upfront.
+
+- Athena
+  - Athena and the Glue addons appear to be more complex, and querying a zipped datasource is more complicated
+  - After loading to Athena it is corrupting the data count(*) returns 2,352,861 rows (this is wrong, bc `wc -l <filename.csv>` on the uncompressed csv is only 2,145,470) 
+
+Given that Athena is corrupting the data, I must again pivot. The two remaining options are to store the data in a dynamodb table, and some sort of RDS (technically Aurora Serverless is offered under RDS). If RDS is required then aurora serverless is pretty awesome, however it adds complexity in how the db can be queried, as you can only query via the api. 
 
 ### Assumptions
 
