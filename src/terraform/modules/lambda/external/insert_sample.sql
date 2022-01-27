@@ -1,0 +1,2 @@
+-- SELECT * FROM flight.flightlist;
+INSERT INTO flightlist(callsign,number,icao24,registration,typecode,origin,destination,firstseen,lastseen,day,latitude_1,longitude_1,altitude_1,latitude_2,longitude_2,altitude_2) VALUES ('HVN19',NULL,'888152',NULL,NULL,'YMML','LFPG',STR_TO_DATE('2018-12-31 00:43:16+00:00','%Y-%m-%d %H:%i:%s+%TZ'),STR_TO_DATE('2019-01-01 04:56:29+00:00','%Y-%m-%d %H:%i:%s+%TZ'),STR_TO_DATE('2019-01-01 00:00:00+00:00','%Y-%m-%d %H:%i:%s+%TZ'),'-37.65948486328130','144.80442128282900',304.8,'48.99531555175780','2.610802283653850','-53.34');

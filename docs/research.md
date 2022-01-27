@@ -20,6 +20,7 @@
   - nor does it have the ability to select the aggregate max of a date time
   - additionally, the file is too large to query in the s3 console meaning that testing of the syntax was conducted used boto3 on the local machine
 - Converting the string to a datetime was a challenge that was solved `TO_TIMESTAMP(lastseen, 'y-MM-dd H:mm:ssXXX')`.
+  - Solved again for MySQL '%Y-%m-%d %H:%i:%s+%TZ'
 
 As a result of these challenges the next pivot is to try using Athena, which has complex query capabilities, however it requires defining a schema upfront.
 
@@ -30,7 +31,9 @@ As a result of these challenges the next pivot is to try using Athena, which has
 Given that Athena is corrupting the data, I must again pivot. The two remaining options are to store the data in a dynamodb table, and some sort of RDS (technically Aurora Serverless is offered under RDS). If RDS is required then aurora serverless is pretty awesome, however it adds complexity in how the db can be queried, as you can only query via the api. According to this StackOverflow, loading directly from s3 to aurora serverless is not supported [https://stackoverflow.com/questions/58357429/load-csv-from-s3-into-aws-rds-aurora-mysql-serverless](https://stackoverflow.com/questions/58357429/load-csv-from-s3-into-aws-rds-aurora-mysql-serverless).
 
 Aurora Serverless
+
 - [https://aws.amazon.com/blogs/database/using-the-data-api-to-interact-with-an-amazon-aurora-serverless-mysql-database/](https://aws.amazon.com/blogs/database/using-the-data-api-to-interact-with-an-amazon-aurora-serverless-mysql-database/)
+- Aurora Data API can only execute a single sql stmt at a time as confirmed manually and here [https://www.jeremydaly.com/aurora-serverless-data-api-a-first-look/](https://www.jeremydaly.com/aurora-serverless-data-api-a-first-look/)
 
 ### Assumptions
 

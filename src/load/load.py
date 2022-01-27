@@ -1,16 +1,21 @@
 
 
+import json
+import os
+import sys
 import time
 
 import boto3
 
 # Update these 3 parameters for your environment
-database_name = 'example-terraform-mysql'
-db_cluster_arn = 'example-terraform-mysql.cluster-c5fwgo4gpfdq.us-east-1.rds.amazonaws.com'
-db_credentials_secrets_store_arn = 'arn:aws:secretsmanager:us-east-1:123456789012:secret:dev-AuroraUserSecret-DhpkOI'
+database_name = 'flight'
+db_cluster_arn = 'arn:aws:rds:us-east-1:909067940010:cluster:example-terraform-mysql'
+db_credentials_secrets_store_arn = 'arn:aws:secretsmanager:us-east-1:909067940010:secret:rds_creds-DTfeZs'
 
 # This is the Data API client that will be used in our examples below
-rds_client = boto3.client('rds-data')
+session = boto3.Session(
+    profile_name='iamadmin-production', region_name='us-east-1')
+rds_client = session.client(service_name='rds-data')
 
 # --------------------------------------------------------------------------------
 # Helper Functions
@@ -65,13 +70,17 @@ def example_create_table():
 
 
 try:
-    sql = 'insert into package (package_name, package_version) values (:package_name, :package_version)'
-    sql_parameters = [
-        {'name': 'package_name', 'value': {'stringValue': f'package-2'}},
-        {'name': 'package_version', 'value': {'stringValue': 'version-1'}}
-    ]
-    response = execute_statement(sql, sql_parameters)
-    print(
-        f'Number of records updated: {response["numberOfRecordsUpdated"]}')
+    with open(os.path.join(sys.path[0], 'create_table.sql'), 'r') as sql_script:
+        sql_script_content = sql_script.read()
+        response = execute_statement(sql_script_content)
+        print(json.dumps(response))
+        print(
+            f'Number of records updated: {response["numberOfRecordsUpdated"]}')
+    with open(os.path.join(sys.path[0], 'insert_sample.sql'), 'r') as sql_script:
+        sql_script_content = sql_script.read()
+        response = execute_statement(sql_script_content)
+        print(json.dumps(response))
+        print(
+            f'Number of records updated: {response["numberOfRecordsUpdated"]}')
 except Exception as e:
     print(e)

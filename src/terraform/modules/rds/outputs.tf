@@ -111,3 +111,8 @@ output "mysql_security_group_id" {
   description = "The security group ID of the cluster"
   value       = module.aurora_mysql.security_group_id
 }
+
+# creds secret arn
+output "db_credentials_secret_arn" {
+  value = data.aws_secretsmanager_secret.rds_creds.arn
+}
