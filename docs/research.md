@@ -27,7 +27,10 @@ As a result of these challenges the next pivot is to try using Athena, which has
   - Athena and the Glue addons appear to be more complex, and querying a zipped datasource is more complicated
   - After loading to Athena it is corrupting the data count(*) returns 2,352,861 rows (this is wrong, bc `wc -l <filename.csv>` on the uncompressed csv is only 2,145,470) 
 
-Given that Athena is corrupting the data, I must again pivot. The two remaining options are to store the data in a dynamodb table, and some sort of RDS (technically Aurora Serverless is offered under RDS). If RDS is required then aurora serverless is pretty awesome, however it adds complexity in how the db can be queried, as you can only query via the api. 
+Given that Athena is corrupting the data, I must again pivot. The two remaining options are to store the data in a dynamodb table, and some sort of RDS (technically Aurora Serverless is offered under RDS). If RDS is required then aurora serverless is pretty awesome, however it adds complexity in how the db can be queried, as you can only query via the api. According to this StackOverflow, loading directly from s3 to aurora serverless is not supported [https://stackoverflow.com/questions/58357429/load-csv-from-s3-into-aws-rds-aurora-mysql-serverless](https://stackoverflow.com/questions/58357429/load-csv-from-s3-into-aws-rds-aurora-mysql-serverless).
+
+Aurora Serverless
+- [https://aws.amazon.com/blogs/database/using-the-data-api-to-interact-with-an-amazon-aurora-serverless-mysql-database/](https://aws.amazon.com/blogs/database/using-the-data-api-to-interact-with-an-amazon-aurora-serverless-mysql-database/)
 
 ### Assumptions
 
