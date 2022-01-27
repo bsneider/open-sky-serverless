@@ -21,6 +21,7 @@
   - additionally, the file is too large to query in the s3 console meaning that testing of the syntax was conducted used boto3 on the local machine
 - Converting the string to a datetime was a challenge that was solved `TO_TIMESTAMP(lastseen, 'y-MM-dd H:mm:ssXXX')`.
   - Solved again for MySQL '%Y-%m-%d %H:%i:%s+%TZ'
+  - Solved for PrestoDB / Athena select date_parse(replace(day,'+00:00',''),'%Y-%m-%d %T') from q.q limit 50
 
 As a result of these challenges the next pivot is to try using Athena, which has complex query capabilities, however it requires defining a schema upfront.
 

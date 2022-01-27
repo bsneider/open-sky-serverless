@@ -58,23 +58,33 @@ def execute_statement(sql, sql_parameters=[]):
 # https://docs.aws.amazon.com/cli/latest/reference/rds-data/execute-statement.html
 
 def lambda_handler(event, context):
+    s3 = session.resource('s3')
+    obj = s3.Object('open-sky-raft-galore-easter-egg-20220127121428936900000004',
+                    'flightlist_20190101_20190131.csv.gz').get()['Body']
+    print(obj)
+    return
     create_table()
     print('# 1 read file')
     # 1 read file
     row_count = 0
-    count = 0
-    batch_size = 300
-    insert_start = 'INSERT INTO flightlist(callsign,number,icao24,registration,typecode,origin,destination,firstseen,lastseen,day,latitude_1,longitude_1,altitude_1,latitude_2,longitude_2,altitude_2) values'
+    # insert_start = 'INSERT INTO flightlist(callsign,number,icao24,registration,typecode,origin,destination,firstseen,lastseen,day,latitude_1,longitude_1,altitude_1,latitude_2,longitude_2,altitude_2) values'
+    insert_start = 'INSERT INTO flightlist(icao24,destination,lastseen) values'
     insert_stmt = ''
+    max_insert_len = 65536
     with gzip.open(os.path.join(sys.path[0], "flightlist_20190101_20190131.csv.gz"), 'rb') as f:
         for row in f:
             if row_count == 0:
                 row_count += 1
                 continue
-            count += 1
             if insert_stmt == '':
                 insert_stmt = insert_start
-            if count >= batch_size:
+            row = row.decode().rstrip().split(',')
+            indices = [2, 6, 8]
+            needed_cols = [row[val] for val in indices]
+            data = "','".join(needed_cols)
+            insert_len = len(insert_stmt)
+            next_line = f"('{data}'),"
+            if insert_len + len(next_line) >= max_insert_len:
                 try:
                     insert_stmt = insert_stmt.rstrip(',')
                     execute_statement(insert_stmt)
@@ -83,11 +93,11 @@ def lambda_handler(event, context):
                     break
                 finally:
                     print('next batch')
-                    count = 0
                     insert_stmt = insert_start
-            row = row.decode().rstrip().replace(
-                '+00:00', '').replace(',', "','")
-            insert_stmt = insert_stmt + f"('{row}'),"
+
+            insert_stmt = insert_stmt + next_line
+            # print(insert_stmt)
+            # break
 
 
 # def prepare_row(row, header):
