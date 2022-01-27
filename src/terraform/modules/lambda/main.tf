@@ -2,6 +2,13 @@ data "template_file" "t_file" {
   count = length(local.source_files)
 
   template = file(element(local.source_files, count.index))
+  vars = {
+    db_cluster_arn = var.db_arn
+    rds_creds_arn  = var.rds_creds_arn
+    bucket_name    = var.bucket_name
+    file_name      = var.file_name
+
+  }
 }
 
 data "archive_file" "lambdzip" {
@@ -18,6 +25,10 @@ data "archive_file" "lambdzip" {
   source {
     filename = basename(local.source_files[2])
     content  = data.template_file.t_file.2.rendered
+  }
+  source {
+    filename = basename(local.source_files[3])
+    content  = data.template_file.t_file.3.rendered
   }
 }
 
@@ -69,8 +80,8 @@ resource "aws_lambda_function" "scrape" {
   source_code_hash = data.archive_file.lambdzip.output_base64sha256
   role             = aws_iam_role.scrape_to_s3.arn
   memory_size      = 2048
-  runtime          = "python3.8"
-  timeout          = 300
+  runtime          = "python3.7"
+  timeout          = 600
   tracing_config {
     mode = "PassThrough"
   }
@@ -104,8 +115,9 @@ data "template_file" "s3_to_rds_policy" {
   template = file("${path.module}/s3_to_rds_policy.json")
 
   vars = {
-    s3_arn  = "${var.s3_arn}",
-    rds_arn = "${var.db_arn}"
+    s3_arn        = "${var.s3_arn}",
+    rds_arn       = "${var.db_arn}",
+    rds_creds_arn = "${var.rds_creds_arn}"
   }
 }
 

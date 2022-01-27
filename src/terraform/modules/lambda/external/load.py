@@ -2,24 +2,20 @@
 
 import gzip
 import json
-import os
-import sys
 import time
 
 import boto3
-from botocore.exceptions import NoCredentialsError
-from botocore.vendored import requests
 
 # Update these 3 parameters for your environment
 database_name = 'flight'
-db_cluster_arn = 'arn:aws:rds:us-east-1:909067940010:cluster:example-terraform-mysql'
-db_credentials_secrets_store_arn = 'arn:aws:secretsmanager:us-east-1:909067940010:secret:rds_creds-DTfeZs'
-
+db_cluster_arn = "${db_cluster_arn}"
+db_credentials_secrets_store_arn = "${rds_creds_arn}"
 # This is the Data API client that will be used in our examples below
-session = boto3.Session(
-    profile_name='iamadmin-production', region_name='us-east-1')
+session = boto3.Session(region_name='us-east-1')
 rds_client = session.client(service_name='rds-data')
-
+s3 = session.resource('s3')
+bucket = "${bucket_name}"
+key = "${file_name}"
 # --------------------------------------------------------------------------------
 # Helper Functions
 # --------------------------------------------------------------------------------
@@ -52,33 +48,59 @@ def execute_statement(sql, sql_parameters=[]):
     return response
 
 
-# https://aws.amazon.com/blogs/database/using-the-data-api-to-interact-with-an-amazon-aurora-serverless-mysql-database/
-# Source https://erangad.medium.com/upload-a-remote-image-to-s3-without-saving-it-first-with-python-def9c6ee1140
-# https://stackoverflow.com/questions/40741282/cannot-use-requests-module-on-aws-lambda
-# https://docs.aws.amazon.com/cli/latest/reference/rds-data/execute-statement.html
+sql_script_content = '''CREATE TABLE IF NOT EXISTS flightlist(
+pk BIGINT NOT NULL AUTO_INCREMENT
+,callsign     VARCHAR(30)
+,number       VARCHAR(30)
+,icao24       VARCHAR(6)
+,registration VARCHAR(15)
+,typecode     VARCHAR(20)
+,origin       VARCHAR(8)
+,destination  VARCHAR(15)
+,firstseen    varchar(26)
+,lastseen     varchar(26)
+,day          varchar(26)
+,latitude_1   VARCHAR(30) 
+,longitude_1  VARCHAR(30) 
+,altitude_1   VARCHAR(30) 
+,latitude_2   VARCHAR(30) 
+,longitude_2  VARCHAR(30) 
+,altitude_2   VARCHAR(30)
+,PRIMARY KEY (pk)
+);'''
+
+
+def create_table():
+    print('creating table if not exists')
+
+    response = execute_statement(sql_script_content)
+    print(json.dumps(response))
+    print(
+        f'Number of records updated: {response["numberOfRecordsUpdated"]}')
+
 
 def lambda_handler(event, context):
-    s3 = session.resource('s3')
-    obj = s3.Object('open-sky-raft-galore-easter-egg-20220127121428936900000004',
-                    'flightlist_20190101_20190131.csv.gz').get()['Body']
-    print(obj)
-    return
     create_table()
     print('# 1 read file')
+    try:
+        obj = s3.Object(bucket, key).get()['Body']
+    except Exception as e:
+        print(e)
+
     # 1 read file
     row_count = 0
     # insert_start = 'INSERT INTO flightlist(callsign,number,icao24,registration,typecode,origin,destination,firstseen,lastseen,day,latitude_1,longitude_1,altitude_1,latitude_2,longitude_2,altitude_2) values'
     insert_start = 'INSERT INTO flightlist(icao24,destination,lastseen) values'
     insert_stmt = ''
     max_insert_len = 65536
-    with gzip.open(os.path.join(sys.path[0], "flightlist_20190101_20190131.csv.gz"), 'rb') as f:
+    with gzip.open(obj, 'rt') as f:
         for row in f:
             if row_count == 0:
                 row_count += 1
                 continue
             if insert_stmt == '':
                 insert_stmt = insert_start
-            row = row.decode().rstrip().split(',')
+            row = row.split(',')
             indices = [2, 6, 8]
             needed_cols = [row[val] for val in indices]
             data = "','".join(needed_cols)
@@ -96,44 +118,6 @@ def lambda_handler(event, context):
                     insert_stmt = insert_start
 
             insert_stmt = insert_stmt + next_line
-            # print(insert_stmt)
-            # break
-
-
-# def prepare_row(row, header):
-#     # INSERT INTO flightlist(callsign,number,icao24,registration,typecode,origin,destination,firstseen,lastseen,day,latitude_1,longitude_1,altitude_1,latitude_2,longitude_2,altitude_2) VALUES ('HVN19',NULL,'888152',NULL,NULL,'YMML','LFPG',STR_TO_DATE('2018-12-31 00:43:16+00:00','%Y-%m-%d %H:%i:%s+%TZ'),STR_TO_DATE('2019-01-01 04:56:29+00:00','%Y-%m-%d %H:%i:%s+%TZ'),STR_TO_DATE('2019-01-01 00:00:00+00:00','%Y-%m-%d %H:%i:%s+%TZ'),'-37.65948486328130','144.80442128282900',304.8,'48.99531555175780','2.610802283653850','-53.34');
-#     # sql = 'insert into package (package_name, package_version) values (:package_name, :package_version)'
-#     datetime_fields = ['firstseen', 'lastseen', 'day']
-#     entry = []
-#     for i, item in enumerate(row.split(',')):
-#         col_name = header[i]
-#         if col_name in datetime_fields:
-#             item = item.split('+')[0]
-#         e = {'name': f'{col_name}', 'value': {
-#                      'stringValue': f'{item}'}}
-#         entry.append(e)
-#     return entry
-
-
-def create_table():
-    with open(os.path.join(sys.path[0], 'create_table.sql'), 'r') as sql_script:
-        sql_script_content = sql_script.read()
-        response = execute_statement(sql_script_content)
-        print(json.dumps(response))
-        print(
-            f'Number of records updated: {response["numberOfRecordsUpdated"]}')
-
-
-try:
-
-    print('start')
-    lambda_handler(None, None)
-    print('finish')
-    # with open(os.path.join(sys.path[0], 'insert_sample.sql'), 'r') as sql_script:
-    #     sql_script_content = sql_script.read()
-    #     response = execute_statement(sql_script_content)
-    #     print(json.dumps(response))
-    #     print(
-    #         f'Number of records updated: {response["numberOfRecordsUpdated"]}')
-except Exception as e:
-    print(e)
+        # don't forget the last batch
+        insert_stmt = insert_stmt.rstrip(',')
+        execute_statement(insert_stmt)

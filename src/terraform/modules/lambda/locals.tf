@@ -3,8 +3,9 @@
 locals {
 
   source_files = [
-    "${path.module}/external/scraper.py",
+    "${path.module}/external/scrape.py",
     "${path.module}/external/load.py",
     "${path.module}/external/report.py",
+    "${path.module}/external/create_table.sql",
   ]
 }

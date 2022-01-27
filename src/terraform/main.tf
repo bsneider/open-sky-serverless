@@ -30,6 +30,9 @@ module "lambda" {
   api_gw_source_arn = module.api_gw.api_gw_source_arn
   db_arn            = module.rds.mysql_cluster_arn
   s3_arn            = module.s3.s3_arn
+  rds_creds_arn     = module.rds.db_credentials_secret_arn
+  bucket_name       = module.s3.bucket_name
+  file_name         = "flightlist_20190101_20190131.csv.gz"
 }
 
 module "api_gw" {

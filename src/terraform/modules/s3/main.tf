@@ -7,7 +7,6 @@ resource "aws_kms_key" "mykey" {
 
 resource "aws_s3_bucket" "s3" {
   bucket_prefix = "open-sky-raft-galore-easter-egg-"
-  acl           = "private"
   server_side_encryption_configuration {
     rule {
       apply_server_side_encryption_by_default {
@@ -24,4 +23,12 @@ resource "aws_s3_bucket" "s3" {
     allowed_origins = ["*"]
     max_age_seconds = 3000
   }
+}
+
+resource "aws_s3_bucket_object" "flightlist" {
+  bucket = aws_s3_bucket.s3.id
+  key    = "flightlist_20190101_20190131.csv.gz"
+  source = "${path.module}/external/flightlist_20190101_20190131.csv.gz"
+  etag   = filemd5("${path.module}/external/flightlist_20190101_20190131.csv.gz")
+
 }

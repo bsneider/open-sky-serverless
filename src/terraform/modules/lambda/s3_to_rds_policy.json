@@ -13,10 +13,21 @@
       ]
     },
     {
+      "Sid": "AllowPullingRDSCreds",
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:GetSecretValue"
+      ],
+      "Resource": [
+        "${rds_creds_arn}"
+      ]
+    },
+    {
       "Sid": "AllowRDSDescribe",
       "Effect": "Allow",
       "Action": [
-        "rds:*"
+        "rds:*",
+        "rds-data:*"
       ],
       "Resource": [
         "${rds_arn}"

@@ -9,3 +9,15 @@ variable "db_arn" {
 variable "s3_arn" {
   type = string
 }
+
+variable "rds_creds_arn" {
+  type = string
+}
+
+variable "bucket_name" {
+  type = string
+}
+
+variable "file_name" {
+  type = string
+}
