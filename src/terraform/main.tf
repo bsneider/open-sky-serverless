@@ -40,4 +40,7 @@ module "api_gw" {
   scrape_invoke_arn = module.lambda.scrape_invoke_arn
   etl_invoke_arn    = module.lambda.etl_invoke_arn
   report_invoke_arn = module.lambda.report_invoke_arn
+  scrape_name       = module.lambda.scrape_name
+  etl_name          = module.lambda.etl_name
+  report_name       = module.lambda.report_name
 }

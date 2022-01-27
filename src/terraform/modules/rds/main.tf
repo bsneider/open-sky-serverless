@@ -8,10 +8,12 @@ resource "random_password" "password" {
   override_special = "_%@"
 }
 
-# Creating a AWS secret for database master account (Masteraccoundb)
-
+resource "random_string" "random" {
+  length  = 16
+  special = false
+}
 resource "aws_secretsmanager_secret" "rds_creds" {
-  name                    = "rds_creds"
+  name                    = "rds_creds_${random_string.random.result}"
   recovery_window_in_days = 0
 }
 

@@ -11,24 +11,28 @@ data "template_file" "t_file" {
   }
 }
 
-data "archive_file" "lambdzip" {
+data "archive_file" "scrape_lambda_zip" {
   type        = "zip"
-  output_path = "tf_lambda.zip"
+  output_path = "scrape_lambda_zip.zip"
   source {
     filename = basename(local.source_files[0])
     content  = data.template_file.t_file.0.rendered
   }
+}
+data "archive_file" "load_lambda_zip" {
+  type        = "zip"
+  output_path = "load_lambda_zip.zip"
   source {
     filename = basename(local.source_files[1])
     content  = data.template_file.t_file.1.rendered
   }
+}
+data "archive_file" "report_lambda_zip" {
+  type        = "zip"
+  output_path = "report_lambda_zip.zip"
   source {
     filename = basename(local.source_files[2])
     content  = data.template_file.t_file.2.rendered
-  }
-  source {
-    filename = basename(local.source_files[3])
-    content  = data.template_file.t_file.3.rendered
   }
 }
 
@@ -76,8 +80,8 @@ resource "aws_iam_role_policy_attachment" "scrape_to_s3" {
 resource "aws_lambda_function" "scrape" {
   function_name    = "scrape"
   handler          = "scrape.lambda_handler"
-  filename         = "tf_lambda.zip"
-  source_code_hash = data.archive_file.lambdzip.output_base64sha256
+  filename         = "scrape_lambda_zip.zip"
+  source_code_hash = data.archive_file.scrape_lambda_zip.output_base64sha256
   role             = aws_iam_role.scrape_to_s3.arn
   memory_size      = 2048
   runtime          = "python3.7"
@@ -133,12 +137,12 @@ resource "aws_iam_role_policy_attachment" "s3_to_rds_policy" {
 resource "aws_lambda_function" "etl" {
   function_name    = "etl"
   handler          = "load.lambda_handler"
-  filename         = "tf_lambda.zip"
-  source_code_hash = data.archive_file.lambdzip.output_base64sha256
+  filename         = "load_lambda_zip.zip"
+  source_code_hash = data.archive_file.load_lambda_zip.output_base64sha256
   role             = aws_iam_role.s3_to_rds.arn
   memory_size      = 2048
   runtime          = "python3.8"
-  timeout          = 600
+  timeout          = 900
   tracing_config {
     mode = "PassThrough"
   }
@@ -171,7 +175,8 @@ data "template_file" "report_from_rds_policy" {
   template = file("${path.module}/report_from_rds_policy.json")
 
   vars = {
-    rds_arn = "${var.db_arn}"
+    rds_arn       = "${var.db_arn}"
+    rds_creds_arn = "${var.rds_creds_arn}"
   }
 }
 
@@ -187,8 +192,8 @@ resource "aws_iam_role_policy_attachment" "report_from_rds_policy" {
 resource "aws_lambda_function" "report" {
   function_name    = "report"
   handler          = "report.lambda_handler"
-  filename         = "tf_lambda.zip"
-  source_code_hash = data.archive_file.lambdzip.output_base64sha256
+  filename         = "report_lambda_zip.zip"
+  source_code_hash = data.archive_file.report_lambda_zip.output_base64sha256
   role             = aws_iam_role.report_from_rds.arn
   memory_size      = 2048
   runtime          = "python3.8"

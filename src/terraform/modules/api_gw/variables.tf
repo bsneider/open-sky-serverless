@@ -12,3 +12,15 @@ variable "report_invoke_arn" {
   type        = string
   description = "arn of lambda that returns results of the report"
 }
+
+variable "etl_name" {
+  type = string
+}
+
+variable "report_name" {
+  type = string
+}
+
+variable "scrape_name" {
+  type = string
+}

@@ -5,6 +5,7 @@ import json
 import time
 
 import boto3
+from botocore.exceptions import ClientError
 
 # Update these 3 parameters for your environment
 database_name = 'flight'
@@ -20,6 +21,33 @@ key = "${file_name}"
 # Helper Functions
 # --------------------------------------------------------------------------------
 
+# https://stackoverflow.com/questions/58192747/aws-aurora-serverless-communication-link-failure
+
+
+def _wait_for_serverless():
+    delay = 5
+    max_attempts = 10
+
+    attempt = 0
+    while attempt < max_attempts:
+        attempt += 1
+
+        try:
+            execute_statement('SELECT 1')
+            return
+        except ClientError as ce:
+            error_code = ce.response.get("Error").get('Code')
+            error_msg = ce.response.get("Error").get('Message')
+
+            # Aurora serverless is waking up
+            if error_code == 'BadRequestException' and 'Communications link failure' in error_msg:
+                print('Sleeping ' + str(delay) +
+                      ' secs, waiting RDS connection')
+                time.sleep(delay)
+            else:
+                raise ce
+
+    raise Exception('Waited for RDS Data but still getting error')
 # Timing function executions
 
 
@@ -80,6 +108,7 @@ def create_table():
 
 
 def lambda_handler(event, context):
+    _wait_for_serverless()
     create_table()
     print('# 1 read file')
     try:

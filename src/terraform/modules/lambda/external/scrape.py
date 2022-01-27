@@ -11,9 +11,6 @@ file_name = "${file_name}"
 #  Source https: // erangad.medium.com/upload-a-remote-image-to-s3-without-saving-it-first-with-python-def9c6ee1140
 # https://stackoverflow.com/questions/40741282/cannot-use-requests-module-on-aws-lambda
 
-ACCESS_KEY_ID = '*************'
-SECRET_ACCESS_KEY = '********************************'
-
 
 def lambda_handler(event, context):
     # body = json.loads(event["body"])

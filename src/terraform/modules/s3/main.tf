@@ -15,7 +15,7 @@ resource "aws_s3_bucket_object" "flightlist" {
   bucket = aws_s3_bucket.s3.id
   key    = "flightlist_20190101_20190131.csv.gz"
   source = "${path.module}/external/flightlist_20190101_20190131.csv.gz"
-  etag   = filemd5("${path.module}/external/flightlist_20190101_20190131.csv.gz")
+  # etag   = filemd5("${path.module}/external/flightlist_20190101_20190131.csv.gz")
 
 }
 

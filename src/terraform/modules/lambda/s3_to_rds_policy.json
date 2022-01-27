@@ -26,7 +26,6 @@
       "Sid": "AllowRDSDescribe",
       "Effect": "Allow",
       "Action": [
-        "rds:*",
         "rds-data:*"
       ],
       "Resource": [

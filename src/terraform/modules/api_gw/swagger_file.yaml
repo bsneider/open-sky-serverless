@@ -8,8 +8,8 @@ basePath: "/beta"
 schemes:
   - "https"
 paths:
-  /events:
-    options:
+  /report:
+    get:
       consumes:
         - "application/json"
       produces:
@@ -19,43 +19,17 @@ paths:
           description: "200 response"
           schema:
             $ref: "#/definitions/Empty"
-          headers:
-            Access-Control-Allow-Origin:
-              type: "string"
-            Access-Control-Allow-Methods:
-              type: "string"
-            Access-Control-Allow-Headers:
-              type: "string"
       x-amazon-apigateway-integration:
-        responses:
-          default:
-            statusCode: "200"
-            responseParameters:
-              method.response.header.Access-Control-Allow-Methods: "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
-              method.response.header.Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
-              method.response.header.Access-Control-Allow-Origin: "'*'"
-        requestTemplates:
-          application/json: '{"statusCode": 200}'
-        passthroughBehavior: "when_no_match"
-        type: "mock"
-    x-amazon-apigateway-any-method:
-      produces:
-        - "application/json"
-      responses:
-        "200":
-          description: "200 response"
-          schema:
-            $ref: "#/definitions/Empty"
-      x-amazon-apigateway-integration:
+        type: "aws_proxy"
         uri: ${report_invoke_arn}
         httpMethod: "GET"
         responses:
           default:
             statusCode: "200"
-        passthroughBehavior: "when_no_match"
+        requestTemplates:
+          application/json: '{"field": "value", "action": "GET"}'
+        passthroughBehavior: "when_no_templates"
         contentHandling: "CONVERT_TO_TEXT"
-        type: "aws_proxy"
-
   /etl:
     post:
       consumes:

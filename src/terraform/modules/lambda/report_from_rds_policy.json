@@ -5,10 +5,21 @@
       "Sid": "AllowRDSDescribe",
       "Effect": "Allow",
       "Action": [
-        "rds:Describe"
+        "rds-data:Describe",
+        "rds-data:ExecuteStatement"
       ],
       "Resource": [
         "${rds_arn}"
+      ]
+    },
+    {
+      "Sid": "AllowPullingRDSCreds",
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:GetSecretValue"
+      ],
+      "Resource": [
+        "${rds_creds_arn}"
       ]
     }
   ]
