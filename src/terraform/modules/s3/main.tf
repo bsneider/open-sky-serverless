@@ -1,21 +1,7 @@
 ## Create S3 bucket
 
-resource "aws_kms_key" "mykey" {
-  description             = "This key is used to encrypt bucket objects"
-  deletion_window_in_days = 10
-}
-
 resource "aws_s3_bucket" "s3" {
   bucket_prefix = "open-sky-raft-galore-easter-egg-"
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        kms_master_key_id = aws_kms_key.mykey.arn
-        sse_algorithm     = "aws:kms"
-      }
-    }
-  }
-  #enable uploading from lambdas and api gw. Will set to * for now
 
   cors_rule {
     allowed_headers = ["*"]
@@ -32,3 +18,26 @@ resource "aws_s3_bucket_object" "flightlist" {
   etag   = filemd5("${path.module}/external/flightlist_20190101_20190131.csv.gz")
 
 }
+
+# resource "aws_lambda_permission" "allow_bucket" {
+#   statement_id  = "AllowExecutionFromS3Bucket"
+#   action        = "lambda:InvokeFunction"
+#   function_name = aws_lambda_function.func.arn
+#   principal     = "s3.amazonaws.com"
+#   source_arn    = aws_s3_bucket.bucket.arn
+# }
+
+
+
+# resource "aws_s3_bucket_notification" "bucket_notification" {
+#   bucket = aws_s3_bucket.bucket.id
+
+#   lambda_function {
+#     lambda_function_arn = aws_lambda_function.func.arn
+#     events              = ["s3:ObjectCreated:*"]
+#     filter_prefix       = "AWSLogs/"
+#     filter_suffix       = ".log"
+#   }
+
+#   depends_on = [aws_lambda_permission.allow_bucket]
+# }

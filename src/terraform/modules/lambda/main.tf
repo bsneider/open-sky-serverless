@@ -138,7 +138,7 @@ resource "aws_lambda_function" "etl" {
   role             = aws_iam_role.s3_to_rds.arn
   memory_size      = 2048
   runtime          = "python3.8"
-  timeout          = 300
+  timeout          = 600
   tracing_config {
     mode = "PassThrough"
   }
