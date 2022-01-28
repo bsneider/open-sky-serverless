@@ -2,6 +2,7 @@
 
 - [open-sky-serverless](#open-sky-serverless)
   - [Assignment - Terraform AWS Deployment](#assignment---terraform-aws-deployment)
+  - [Quick Start](#quick-start)
     - [Research / Architecture Decisions](#research--architecture-decisions)
     - [Prerequisite](#prerequisite)
     - [Requirements](#requirements)
@@ -9,6 +10,10 @@
     - [Gift Card](#gift-card)
 
 ## Assignment - Terraform AWS Deployment
+
+## Quick Start
+
+[Quick Start](docs/quick-start.md)
 
 ### Research / Architecture Decisions
 
