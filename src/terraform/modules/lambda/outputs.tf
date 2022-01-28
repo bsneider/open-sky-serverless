@@ -12,6 +12,10 @@ output "load_invoke_arn" {
   value       = aws_lambda_function.load.invoke_arn
 }
 
+output "load_arn" {
+  value = aws_lambda_function.load.arn
+}
+
 output "load_name" {
   value = aws_lambda_function.load.function_name
 }

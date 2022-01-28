@@ -17,7 +17,7 @@ module "vpc" {
 
 module "s3" {
   source           = "./modules/s3"
-  load_lambda_arn  = module.lambda.load_invoke_arn
+  load_lambda_arn  = module.lambda.load_arn
   load_lambda_name = module.lambda.load_name
 }
 

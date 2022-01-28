@@ -12,49 +12,27 @@ resource "aws_s3_bucket" "s3" {
 }
 
 resource "aws_s3_bucket_object" "flightlist" {
-  bucket = aws_s3_bucket.s3.id
-  key    = "flightlist_20190101_20190131.csv.gz"
-  source = "${path.module}/external/flightlist_20190101_20190131.csv.gz"
-  # etag   = filemd5("${path.module}/external/flightlist_20190101_20190131.csv.gz")
-
+  bucket     = aws_s3_bucket.s3.id
+  key        = "flightlist_20190101_20190131.csv.gz"
+  source     = "${path.module}/external/flightlist_20190101_20190131.csv.gz"
+  depends_on = [aws_s3_bucket_notification.aws_lambda_trigger]
 }
 
 # Adding S3 bucket as trigger to my lambda and giving the permissions
-resource "aws_s3_bucket_notification" "aws-lambda-trigger" {
+resource "aws_s3_bucket_notification" "aws_lambda_trigger" {
   bucket = aws_s3_bucket.s3.id
   lambda_function {
     lambda_function_arn = var.load_lambda_arn
     events              = ["s3:ObjectCreated:*"]
+    filter_suffix       = ".csv.gz"
 
   }
+  depends_on = [aws_lambda_permission.allow_bucket]
 }
-resource "aws_lambda_permission" "test" {
+resource "aws_lambda_permission" "allow_bucket" {
   statement_id  = "AllowS3Invoke"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.test_lambda.function_name
+  function_name = var.load_lambda_name
   principal     = "s3.amazonaws.com"
-  source_arn    = "arn:aws:s3:::${aws_s3_bucket.bucket.id}"
+  source_arn    = "arn:aws:s3:::${aws_s3_bucket.s3.id}"
 }
-
-# resource "aws_lambda_permission" "allow_bucket" {
-#   statement_id  = "AllowExecutionFromS3Bucket"
-#   action        = "lambda:InvokeFunction"
-#   function_name = aws_lambda_function.func.arn
-#   principal     = "s3.amazonaws.com"
-#   source_arn    = aws_s3_bucket.bucket.arn
-# }
-
-
-
-# resource "aws_s3_bucket_notification" "bucket_notification" {
-#   bucket = aws_s3_bucket.bucket.id
-
-#   lambda_function {
-#     lambda_function_arn = aws_lambda_function.func.arn
-#     events              = ["s3:ObjectCreated:*"]
-#     filter_prefix       = "AWSLogs/"
-#     filter_suffix       = ".log"
-#   }
-
-#   depends_on = [aws_lambda_permission.allow_bucket]
-# }
