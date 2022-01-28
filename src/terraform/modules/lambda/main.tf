@@ -36,8 +36,13 @@ data "archive_file" "report_lambda_zip" {
   }
 }
 
+resource "random_string" "random" {
+  length  = 7
+  special = false
+}
+
 resource "aws_iam_role" "scrape_to_s3" {
-  name                 = "scrape_to_s3"
+  name                 = "scrape_to_s3${random_string.random.result}"
   max_session_duration = 3600
   assume_role_policy   = <<EOF
 {
@@ -93,7 +98,7 @@ resource "aws_lambda_function" "scrape" {
 
 
 resource "aws_iam_role" "s3_to_rds" {
-  name                 = "s3_to_rds"
+  name                 = "s3_to_rds${random_string.random.result}"
   max_session_duration = 3600
   assume_role_policy   = <<EOF
 {
@@ -149,7 +154,7 @@ resource "aws_lambda_function" "load" {
 }
 
 resource "aws_iam_role" "report_from_rds" {
-  name                 = "report_from_rds"
+  name                 = "report_from_rds${random_string.random.result}"
   max_session_duration = 3600
   assume_role_policy   = <<EOF
 {
