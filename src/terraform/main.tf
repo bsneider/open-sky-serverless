@@ -37,6 +37,7 @@ module "lambda" {
   rds_creds_arn     = module.rds.db_credentials_secret_arn
   bucket_name       = module.s3.bucket_name
   file_name         = "flightlist_20190101_20190131.csv.gz"
+  region            = local.region
 }
 
 module "api_gw" {

@@ -7,7 +7,7 @@ data "template_file" "t_file" {
     rds_creds_arn  = var.rds_creds_arn
     bucket_name    = var.bucket_name
     file_name      = var.file_name
-
+    region_name    = var.region
   }
 }
 

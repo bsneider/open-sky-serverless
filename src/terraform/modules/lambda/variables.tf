@@ -21,3 +21,7 @@ variable "bucket_name" {
 variable "file_name" {
   type = string
 }
+
+variable "region" {
+  type = string
+}

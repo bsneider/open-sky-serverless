@@ -21,8 +21,9 @@ unique_icao24 = '''select count(distinct icao24) from flight.flightlist'''
 database_name = 'flight'
 db_cluster_arn = "${db_cluster_arn}"
 db_credentials_secrets_store_arn = "${rds_creds_arn}"
+region_name = "${region_name}"
 # This is the Data API client that will be used in our examples below
-session = boto3.Session(region_name='us-east-1')
+session = boto3.Session(region_name=region_name)
 rds_client = session.client(service_name='rds-data')
 
 
