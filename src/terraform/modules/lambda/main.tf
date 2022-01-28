@@ -134,8 +134,8 @@ resource "aws_iam_role_policy_attachment" "s3_to_rds_policy" {
   policy_arn = resource.aws_iam_policy.s3_to_rds_policy.arn
 }
 
-resource "aws_lambda_function" "etl" {
-  function_name    = "etl"
+resource "aws_lambda_function" "load" {
+  function_name    = "load"
   handler          = "load.lambda_handler"
   filename         = "load_lambda_zip.zip"
   source_code_hash = data.archive_file.load_lambda_zip.output_base64sha256

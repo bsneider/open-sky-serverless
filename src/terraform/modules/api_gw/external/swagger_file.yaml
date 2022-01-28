@@ -26,7 +26,7 @@ paths:
             statusCode: "200"
         passthroughBehavior: "when_no_match"
         contentHandling: "CONVERT_TO_TEXT"
-  /etl:
+  /load:
     post:
       consumes:
         - "application/json"
@@ -39,7 +39,7 @@ paths:
             $ref: "#/definitions/Empty"
       x-amazon-apigateway-integration:
         type: "aws_proxy"
-        uri: ${etl_invoke_arn}
+        uri: ${load_invoke_arn}
         httpMethod: "POST"
         responses:
           default:

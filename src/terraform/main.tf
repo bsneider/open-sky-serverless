@@ -17,8 +17,8 @@ module "vpc" {
 
 module "s3" {
   source           = "./modules/s3"
-  load_lambda_arn  = module.lambda.etl_invoke_arn
-  load_lambda_name = module.lambda.etl_name
+  load_lambda_arn  = module.lambda.load_invoke_arn
+  load_lambda_name = module.lambda.load_name
 }
 
 module "rds" {
@@ -42,9 +42,9 @@ module "lambda" {
 module "api_gw" {
   source            = "./modules/api_gw"
   scrape_invoke_arn = module.lambda.scrape_invoke_arn
-  etl_invoke_arn    = module.lambda.etl_invoke_arn
+  load_invoke_arn   = module.lambda.load_invoke_arn
   report_invoke_arn = module.lambda.report_invoke_arn
   scrape_name       = module.lambda.scrape_name
-  etl_name          = module.lambda.etl_name
+  load_name         = module.lambda.load_name
   report_name       = module.lambda.report_name
 }

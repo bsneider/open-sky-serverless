@@ -7,13 +7,13 @@ output "scrape_name" {
   value = aws_lambda_function.scrape.function_name
 }
 
-output "etl_invoke_arn" {
+output "load_invoke_arn" {
   description = "arn of lambda to take csv.gz from s3 and load it to db"
-  value       = aws_lambda_function.etl.invoke_arn
+  value       = aws_lambda_function.load.invoke_arn
 }
 
-output "etl_name" {
-  value = aws_lambda_function.etl.function_name
+output "load_name" {
+  value = aws_lambda_function.load.function_name
 }
 
 output "report_invoke_arn" {

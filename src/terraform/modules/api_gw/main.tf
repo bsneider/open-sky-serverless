@@ -48,7 +48,7 @@ data "template_file" "swagger" {
   vars = {
     region            = data.aws_region.current.name
     scrape_invoke_arn = var.scrape_invoke_arn
-    etl_invoke_arn    = var.etl_invoke_arn
+    load_invoke_arn   = var.load_invoke_arn
     report_invoke_arn = var.report_invoke_arn
     exec_role_arn     = aws_iam_role.api_gw_lambda_execution.arn
   }
