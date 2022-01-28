@@ -1,0 +1,51 @@
+---
+name: "Terraform Destroy"
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 22 * * *"
+
+jobs:
+  terraform:
+    name: "Terraform destroy"
+    runs-on: ubuntu-20.04
+    environment: development
+    timeout-minutes: 30
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+    env:
+      TF_VAR_vault_addr: ${{ secrets.VAULT_ADDR }}
+      TF_VAR_login_approle_role_id: ${{ secrets.LOGIN_APPROLE_ROLE_ID }}
+      TF_VAR_login_approle_secret_id: ${{ secrets.LOGIN_APPROLE_SECRET_ID }}
+      TF_VAR_secret_key_base: ${{ secrets.SECRET_KEY_BASE }}
+      TF_VAR_region: ${{ secrets.REGION }}
+      TF_VAR_domain: ${{ secrets.DOMAIN }}
+      TF_VAR_database_name: ${{ secrets.DATABASE_NAME }}
+      TF_VAR_database_username: ${{ secrets.DATABASE_USERNAME }}
+      TF_VAR_database_password: ${{ secrets.DATABASE_PASSWORD }}
+      TF_VAR_rabbit_name: ${{ secrets.RABBIT_NAME }}
+      TF_WORKSPACE: dev
+
+    steps:
+      # Checkout the repository to the GitHub Actions runner
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.0.4
+          cli_config_credentials_token: ${{ secrets.TF_API_USER_TOKEN }}
+
+      # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+      - name: Terraform Init
+        run: terraform init
+
+      # Terraform Destroy auto approve
+      - name: Terraform Destroy
+        run: terraform destroy -auto-approve
