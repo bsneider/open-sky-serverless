@@ -61,7 +61,7 @@ EOF
 
 
 data "template_file" "scrape_to_s3_policy" {
-  template = file("${path.module}/scrape_to_s3_policy.json")
+  template = file("${path.module}/external/scrape_to_s3_policy.json")
 
   vars = {
     s3_arn = "${var.s3_arn}"
@@ -116,7 +116,7 @@ EOF
 }
 
 data "template_file" "s3_to_rds_policy" {
-  template = file("${path.module}/s3_to_rds_policy.json")
+  template = file("${path.module}/external/s3_to_rds_policy.json")
 
   vars = {
     s3_arn        = "${var.s3_arn}",
@@ -172,7 +172,7 @@ EOF
 }
 
 data "template_file" "report_from_rds_policy" {
-  template = file("${path.module}/report_from_rds_policy.json")
+  template = file("${path.module}/external/report_from_rds_policy.json")
 
   vars = {
     rds_arn       = "${var.db_arn}"
