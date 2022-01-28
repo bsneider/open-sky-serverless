@@ -16,7 +16,6 @@ session = boto3.Session(region_name='us-east-1')
 rds_client = session.client(service_name='rds-data')
 s3 = session.resource('s3')
 bucket = "${bucket_name}"
-key = "${file_name}"
 # --------------------------------------------------------------------------------
 # Helper Functions
 # --------------------------------------------------------------------------------
@@ -112,7 +111,8 @@ def lambda_handler(event, context):
     create_table()
     print('# 1 read file')
     try:
-        obj = s3.Object(bucket, key).get()['Body']
+        name = event['Records'][0]['s3']['object']['key']
+        obj = s3.Object(bucket, name).get()['Body']
     except Exception as e:
         print(e)
 
