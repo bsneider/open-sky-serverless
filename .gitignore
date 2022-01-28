@@ -5,6 +5,9 @@
 *.tfstate
 *.tfstate.*
 
+# Ignore the lambda delivery artifacts
+*.zip
+
 # Crash log files
 crash.log
 
