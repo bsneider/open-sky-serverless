@@ -17,6 +17,7 @@ edit src/terraform/locals.tf with your aws profile
 
 ```sh
 git clone git@github.com:bsneider/open-sky-serverless.git
+cd open-sky-serverless
 sh quick-start.sh 
 ```
 
