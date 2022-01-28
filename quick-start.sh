@@ -4,6 +4,7 @@ AWSPROFILE=$1
 
 # download file
 echo 'download file if not exists'
+mkdir -p ./src/terraform/modules/s3/external
 FILE=./src/terraform/modules/s3/external/flightlist_20190101_20190131.csv.gz
 [ -f $FILE ] && echo "$FILE exists." || curl --progress-bar "https://zenodo.org/record/5377831/files/flightlist_20190101_20190131.csv.gz?download=1" -o $FILE
 
