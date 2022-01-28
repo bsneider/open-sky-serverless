@@ -1,4 +1,5 @@
 #!/bin/bash
+# could further automated with a sed on the locals.tf to adjust the profile
 AWSPROFILE=$1
 
 # download file
