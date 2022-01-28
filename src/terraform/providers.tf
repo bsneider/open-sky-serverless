@@ -9,8 +9,8 @@ terraform {
 
 # Configure the AWS Provider
 provider "aws" {
-  region  = "us-east-1"
-  profile = "iamadmin-production"
+  region  = local.region
+  profile = local.profile
   default_tags {
     tags = {
       Owner       = "user"

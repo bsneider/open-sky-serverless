@@ -3,9 +3,8 @@
 # https://automateinfra.com/2021/03/24/how-to-create-secrets-in-aws-secrets-manager-using-terraform-in-amazon-account/
 ################################################################################
 resource "random_password" "password" {
-  length           = 16
-  special          = true
-  override_special = "_%@"
+  length  = 16
+  special = false
 }
 
 resource "random_string" "random" {

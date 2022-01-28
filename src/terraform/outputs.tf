@@ -1,9 +1,3 @@
-output "mysql_cluster_master_password" {
-  sensitive = true
-  value     = module.rds.mysql_cluster_master_password
-}
-
-output "mysql_cluster_master_username" {
-  sensitive = true
-  value     = module.rds.mysql_cluster_master_username
+output "api_url" {
+  value = module.api_gw.invoke_url
 }
