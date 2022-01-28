@@ -150,3 +150,10 @@ def lambda_handler(event, context):
         # don't forget the last batch
         insert_stmt = insert_stmt.rstrip(',')
         execute_statement(insert_stmt)
+    return {
+        "statusCode": 200,
+        "headers": {
+            "Content-Type": "application/json"
+        },
+        "body": "load complete"
+    }

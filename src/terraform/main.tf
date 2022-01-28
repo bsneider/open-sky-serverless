@@ -14,9 +14,13 @@ module "vpc" {
   private_subnets  = ["10.99.3.0/24", "10.99.4.0/24", "10.99.5.0/24"]
   database_subnets = ["10.99.7.0/24", "10.99.8.0/24", "10.99.9.0/24"]
 }
+
 module "s3" {
-  source = "./modules/s3"
+  source           = "./modules/s3"
+  load_lambda_arn  = module.lambda.etl_invoke_arn
+  load_lambda_name = module.lambda.etl_name
 }
+
 module "rds" {
   source                      = "./modules/rds"
   name                        = local.name

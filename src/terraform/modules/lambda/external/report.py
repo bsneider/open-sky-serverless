@@ -1,4 +1,8 @@
+import json
+import time
+
 import boto3
+from botocore.exceptions import ClientError
 
 destination_sql = '''select destination
 from flight.flightlist 
@@ -33,8 +37,34 @@ def execute_statement(sql, sql_parameters=[]):
     return response
 
 
-def lambda_handler(event, context):
+def _wait_for_serverless():
+    delay = 5
+    max_attempts = 10
 
+    attempt = 0
+    while attempt < max_attempts:
+        attempt += 1
+
+        try:
+            execute_statement('SELECT 1')
+            return
+        except ClientError as ce:
+            error_code = ce.response.get("Error").get('Code')
+            error_msg = ce.response.get("Error").get('Message')
+
+            # Aurora serverless is waking up
+            if error_code == 'BadRequestException' and 'Communications link failure' in error_msg:
+                print('Sleeping ' + str(delay) +
+                      ' secs, waiting RDS connection')
+                time.sleep(delay)
+            else:
+                raise ce
+
+    raise Exception('Waited for RDS Data but still getting error')
+
+
+def lambda_handler(event, context):
+    _wait_for_serverless()
     row_count = list(execute_statement(row_count_sql)
                      ['records'][0][0].values())[0]
     lastseen = list(execute_statement(max_lastseen_sql)
@@ -48,10 +78,10 @@ def lambda_handler(event, context):
         "headers": {
             "Content-Type": "application/json"
         },
-        "body": {
+        "body": json.dumps({
             "row_count ": str(row_count),
             "last_transponder_seen_at": lastseen,
             "most_popular_destination": dest,
             "count_of_unique_transponders": str(uniq_transponders)
-        }
+        })
     }

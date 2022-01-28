@@ -10,8 +10,6 @@ schemes:
 paths:
   /report:
     get:
-      consumes:
-        - "application/json"
       produces:
         - "application/json"
       responses:
@@ -21,14 +19,12 @@ paths:
             $ref: "#/definitions/Empty"
       x-amazon-apigateway-integration:
         type: "aws_proxy"
-        uri: ${report_invoke_arn}
-        httpMethod: "GET"
+        httpMethod: "POST"
+        uri: "${report_invoke_arn}"
         responses:
           default:
             statusCode: "200"
-        requestTemplates:
-          application/json: '{"field": "value", "action": "GET"}'
-        passthroughBehavior: "when_no_templates"
+        passthroughBehavior: "when_no_match"
         contentHandling: "CONVERT_TO_TEXT"
   /etl:
     post:

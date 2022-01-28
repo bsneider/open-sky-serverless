@@ -4,13 +4,53 @@ resource "aws_api_gateway_rest_api" "opensky-api-gateway" {
   body        = data.template_file.swagger.rendered
 }
 
+resource "aws_iam_role" "api_gw_lambda_execution" {
+  name                 = "api_gw_lambda_execution"
+  max_session_duration = 3600
+  assume_role_policy   = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "apigateway.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+  tags = {
+    Name = "api_gw_lambda_execution"
+  }
+}
+data "template_file" "api_gw_lambda_execution_policy" {
+  template = file("${path.module}/external/api_gw_lambda_execution_policy.json")
+
+  # vars = {
+  #   s3_arn = "${var.s3_arn}"
+  # }
+}
+
+resource "aws_iam_policy" "api_gw_lambda_execution_policy" {
+  policy = data.template_file.api_gw_lambda_execution_policy.rendered
+}
+
+resource "aws_iam_role_policy_attachment" "api_gw_lambda_execution" {
+  role       = aws_iam_role.api_gw_lambda_execution.name
+  policy_arn = resource.aws_iam_policy.api_gw_lambda_execution_policy.arn
+}
+
 data "template_file" "swagger" {
-  template = file("${path.module}/swagger_file.yaml")
+  template = file("${path.module}/external/swagger_file.yaml")
   vars = {
     region            = data.aws_region.current.name
     scrape_invoke_arn = var.scrape_invoke_arn
     etl_invoke_arn    = var.etl_invoke_arn
     report_invoke_arn = var.report_invoke_arn
+    exec_role_arn     = aws_iam_role.api_gw_lambda_execution.arn
   }
 }
 
