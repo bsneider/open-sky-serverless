@@ -4,8 +4,13 @@ resource "aws_api_gateway_rest_api" "opensky-api-gateway" {
   body        = data.template_file.swagger.rendered
 }
 
+resource "random_string" "random" {
+  length  = 7
+  special = false
+}
+
 resource "aws_iam_role" "api_gw_lambda_execution" {
-  name                 = "api_gw_lambda_execution"
+  name                 = "api_gw_lambda_execution${random_string.random.result}"
   max_session_duration = 3600
   assume_role_policy   = <<EOF
 {
