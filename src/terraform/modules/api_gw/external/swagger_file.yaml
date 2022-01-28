@@ -1,0 +1,86 @@
+---
+swagger: "2.0"
+info:
+  version: "2021-02-15T22:05:16Z"
+  title: "opensky"
+host: "i0kevfmkc8.execute-api.${region}.amazonaws.com"
+basePath: "/beta"
+schemes:
+  - "https"
+paths:
+  /report:
+    get:
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+      x-amazon-apigateway-integration:
+        type: "aws_proxy"
+        httpMethod: "POST"
+        uri: "${report_invoke_arn}"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        contentHandling: "CONVERT_TO_TEXT"
+  /load:
+    post:
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+      x-amazon-apigateway-integration:
+        type: "aws_proxy"
+        uri: ${load_invoke_arn}
+        httpMethod: "POST"
+        responses:
+          default:
+            statusCode: "200"
+        requestTemplates:
+          application/json: '{"field": "value", "action": "GET"}'
+        passthroughBehavior: "when_no_templates"
+        contentHandling: "CONVERT_TO_TEXT"
+  /scrape:
+    post:
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+        "500":
+          description: "500 response"
+        "404":
+          description: "404 response"
+      x-amazon-apigateway-integration:
+        type: "aws"
+        uri: ${scrape_invoke_arn}
+        httpMethod: "POST"
+        responses:
+          default:
+            statusCode: "200"
+          ".*(Unknown|stackTrace).*":
+            statusCode: "500"
+          ".*Not Found.*":
+            statusCode: "404"
+            responseTemplates:
+              application/json: '{"output_value": "not found"}'
+        requestTemplates:
+          application/json: '{"field": "value", "action": "GET"}'
+        passthroughBehavior: "when_no_templates"
+
+definitions:
+  Empty:
+    type: "object"
+    title: "Empty Schema"
